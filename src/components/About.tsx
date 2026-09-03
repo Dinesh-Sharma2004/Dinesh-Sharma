@@ -57,10 +57,6 @@ export const About: React.FC<AboutProps> = ({ onOpenResume }) => {
                   <GraduationCap className="w-4 h-4 text-[#C4623E]" />
                   <span>IIITDM Kurnool</span>
                 </div>
-                <span className="font-semibold text-[#C4623E] bg-[#C4623E]/10 px-2.5 py-0.5 rounded-full">
-                  CPI 7.75/10
-                </span>
-              </div>
             </div>
           </motion.div>
 
