@@ -50,7 +50,7 @@ export const PORTFOLIO_DATA = {
       "AI and Data Science undergraduate with hands-on experience in Python-based machine learning, data pipelines, forecasting, model evaluation, and applied AI. Practical exposure to experimentation, hyperparameter tuning, reproducible workflows, model deployment, monitoring, and scalable APIs. Strong focus on clear documentation and translating data/model results into reliable systems.",
     email: "dineshsharma004785@gmail.com",
     github: "https://github.com/Dinesh-Sharma2004", // Customizable link
-    linkedin: "https://www.linkedin.com/in/dinesh-sharma-ai", // Customizable link
+    linkedin: "https://www.linkedin.com/in/dineshsh4rm4", // Customizable link
     resumeUrl: "#resume", // Can be replaced with a real /resume.pdf file
     systemStatus: "NOMINAL",
     latency: "24ms",
