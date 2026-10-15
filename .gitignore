@@ -1,0 +1,12 @@
+.next
+node_modules
+dist
+out
+.vercel
+*.log
+*.tsbuildinfo
+
+# local env (keep the example tracked)
+.env
+.env.local
+.env*.local

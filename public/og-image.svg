@@ -1,0 +1,35 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#080A10"/>
+  <circle cx="980" cy="110" r="260" fill="url(#a)" fill-opacity="0.5"/>
+  <circle cx="180" cy="540" r="240" fill="url(#b)" fill-opacity="0.42"/>
+  <g stroke="#64E8F2" stroke-opacity="0.5" stroke-width="1.5">
+    <line x1="930" y1="300" x2="1060" y2="200"/>
+    <line x1="930" y1="300" x2="1070" y2="380"/>
+    <line x1="930" y1="300" x2="820" y2="210"/>
+    <line x1="930" y1="300" x2="840" y2="420"/>
+    <line x1="1060" y1="200" x2="1070" y2="380"/>
+  </g>
+  <g>
+    <circle cx="930" cy="300" r="9" fill="#64E8F2"/>
+    <circle cx="1060" cy="200" r="6" fill="#9675FF"/>
+    <circle cx="1070" cy="380" r="6" fill="#64E8F2"/>
+    <circle cx="820" cy="210" r="6" fill="#9675FF"/>
+    <circle cx="840" cy="420" r="6" fill="#D0F56B"/>
+  </g>
+  <rect x="64" y="64" width="1072" height="502" rx="40" fill="white" fill-opacity="0.03" stroke="white" stroke-opacity="0.1"/>
+  <text x="104" y="190" fill="#64E8F2" font-family="monospace" font-size="22" letter-spacing="10">AI ENGINEER · DATA SCIENTIST</text>
+  <text x="100" y="300" fill="#F1F0EB" font-family="Arial, sans-serif" font-size="86" font-weight="800">Dinesh Sharma</text>
+  <text x="104" y="388" fill="#F1F0EB" font-family="Arial, sans-serif" font-size="40" font-weight="600">Engineering intelligence from</text>
+  <text x="104" y="444" fill="#A3A9BA" font-family="Arial, sans-serif" font-size="40" font-weight="600">data, models, and systems.</text>
+  <text x="104" y="520" fill="#A3A9BA" font-family="monospace" font-size="20" letter-spacing="2">RAG · AGENTS · BACKEND · ML/DL · MLOps</text>
+  <defs>
+    <radialGradient id="a" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(980 110) rotate(90) scale(260)">
+      <stop stop-color="#9675FF"/>
+      <stop offset="1" stop-color="#9675FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(180 540) rotate(90) scale(240)">
+      <stop stop-color="#64E8F2"/>
+      <stop offset="1" stop-color="#64E8F2" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>
