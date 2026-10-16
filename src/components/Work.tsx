@@ -11,38 +11,46 @@ gsap.registerPlugin(ScrollTrigger);
 
 const Work = () => {
   useEffect(() => {
-    // Disable pinning on mobile to allow scrolling
-    if (window.innerWidth <= 768) return;
+    const compact = window.innerWidth <= 1024; // phones + tablets: one full-width card at a time
 
-    let translateX: number = 0;
-
-    function setTranslateX() {
+    // Cards differ in width on desktop (the last one is a narrower call-to-action),
+    // so scroll exactly far enough to bring the last card fully into view.
+    function getTranslateX() {
       const box = document.getElementsByClassName("work-box");
-      if (box.length === 0) return;
-      // Cards differ in width (the last one is a narrower call-to-action), so
-      // scroll exactly far enough to bring the last card fully into view.
+      if (box.length === 0) return 0;
+      const flex = document.querySelector<HTMLElement>(".work-flex");
+      const current = flex ? Number(gsap.getProperty(flex, "x")) || 0 : 0;
       const last = box[box.length - 1].getBoundingClientRect();
-      translateX = Math.max(0, last.right - (window.innerWidth - 80));
+      // measure from the un-translated position so refreshes give the same answer
+      const lastRight = last.right - current;
+      return Math.max(0, lastRight - (compact ? window.innerWidth : window.innerWidth - 80));
     }
-
-    setTranslateX();
 
     const timeline = gsap.timeline({
       scrollTrigger: {
         trigger: ".work-section",
         start: "top top",
-        end: `+=${translateX}`,
+        end: () => `+=${getTranslateX()}`,
         scrub: 1,
         pin: true,
         pinSpacing: true,
         anticipatePin: 1,
         id: "work",
         invalidateOnRefresh: true,
+        // phones: settle on one project at a time
+        snap: compact
+          ? {
+              snapTo: 1 / Math.max(1, config.projects.length),
+              duration: { min: 0.2, max: 0.5 },
+              delay: 0.05,
+              ease: "power1.inOut",
+            }
+          : undefined,
       },
     });
 
     timeline.to(".work-flex", {
-      x: -translateX,
+      x: () => -getTranslateX(),
       ease: "none",
     });
 
