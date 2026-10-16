@@ -7,7 +7,8 @@ import { addSpecsBeardAndSmile } from "./faceUpgrades";
 const setCharacter = (
   renderer: THREE.WebGLRenderer,
   scene: THREE.Scene,
-  camera: THREE.PerspectiveCamera
+  camera: THREE.PerspectiveCamera,
+  { withScroll = true }: { withScroll?: boolean } = {}
 ) => {
   const loader = new GLTFLoader();
   const dracoLoader = new DRACOLoader();
@@ -42,8 +43,10 @@ const setCharacter = (
             });
             addSpecsBeardAndSmile(character);
             resolve(gltf);
-            setCharTimeline(character, camera);
-            setAllTimeline();
+            if (withScroll) {
+              setCharTimeline(character, camera);
+              setAllTimeline();
+            }
             character!.getObjectByName("footR")!.position.y = 3.36;
             character!.getObjectByName("footL")!.position.y = 3.36;
             dracoLoader.dispose();

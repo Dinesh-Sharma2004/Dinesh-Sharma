@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { faceRig } from "./faceRig";
 
 /**
  * Upgrades applied to the EXISTING 3D character (no new model):
@@ -9,14 +10,6 @@ import * as THREE from "three";
  * Everything lives in the head mesh's local space, measured from the model:
  * eyes at y~13.25, nose tip y~13.1, mouth slit y~12.60, chin y~12.3, face front z~0.9-1.1.
  */
-
-export const faceRig = {
-  /** 0 = original face, 1 = full smile */
-  // replaced with the real implementation once the model has loaded
-  setSmile: (value: number) => {
-    void value;
-  },
-};
 
 const smooth = (a: number, b: number, x: number) => {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
@@ -304,5 +297,8 @@ export function addSpecsBeardAndSmile(root: THREE.Object3D) {
 
   faceRig.setSmile = (value: number) => {
     smileValue = Math.min(1, Math.max(0, value));
+    faceRig.value = smileValue;
   };
+  // apply whatever the scroll position asked for while the model was loading
+  faceRig.setSmile(faceRig.value);
 }

@@ -589,3 +589,37 @@ h2.landing-info-h2 {
     margin-left: 0 !important;
   }
 }
+
+/* Tablet / mobile: the real 3D character fades in over the static robot */
+@media only screen and (max-width: 1024px) {
+  .mobile-3d {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+    /* fade the sides so the glow and shoulders don't end in a hard edge */
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 16%, #000 84%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 16%, #000 84%, transparent);
+  }
+  .mobile-3d canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    transform: scaleX(-1); /* same orientation as the desktop canvas */
+  }
+  .mobile-3d .character-rim {
+    width: 300px;
+    height: 300px;
+  }
+  .mobile-photo.has-3d .mobile-3d {
+    opacity: 1;
+  }
+  .mobile-photo .character-svg {
+    transition: opacity 0.8s ease;
+  }
+  .mobile-photo.has-3d .character-svg {
+    opacity: 0;
+  }
+}

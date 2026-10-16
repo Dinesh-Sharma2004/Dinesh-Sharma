@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import gsap from "gsap";
-import { faceRig } from "../Character/utils/faceUpgrades";
+import { faceRig } from "../Character/utils/faceRig";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
