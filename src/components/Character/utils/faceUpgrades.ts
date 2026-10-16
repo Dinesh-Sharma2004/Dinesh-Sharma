@@ -62,6 +62,30 @@ function beardWeight(x: number, y: number, z: number): number {
   return Math.max(jaw, mous, bridge);
 }
 
+/**
+ * The same coverage function in GLSL. The beard edge is evaluated per pixel from
+ * the rest-pose position instead of being interpolated from per-vertex alpha:
+ * the face mesh is low-poly, so vertex alpha gave ragged, triangle-shaped edges
+ * that tore apart around the mouth while smiling. The rest position is fixed to
+ * the surface, so the mask follows the smile morph exactly.
+ */
+const BEARD_MASK_GLSL = /* glsl */ `
+float beardWeight(vec3 p) {
+  if (p.z < -0.1) return 0.0;
+  float ax = abs(p.x);
+  float yTop = 12.46 + 0.56 * smoothstep(0.38, 0.95, ax);
+  float jaw = smoothstep(11.95, 12.22, p.y)
+    * (1.0 - smoothstep(yTop - (0.07 + 0.17 * smoothstep(0.4, 0.9, ax)), yTop, p.y))
+    * (1.0 - smoothstep(0.88, 1.1, ax));
+  float mous = (1.0 - smoothstep(0.24, 0.5, ax)) * smoothstep(12.63, 12.72, p.y)
+    * (1.0 - smoothstep(12.75, 12.87, p.y)) * smoothstep(0.3, 0.6, p.z);
+  float bridge = smoothstep(0.26, 0.46, ax) * (1.0 - smoothstep(0.9, 1.08, ax))
+    * smoothstep(12.22, 12.46, p.y) * (1.0 - smoothstep(12.74, 12.88, p.y))
+    * smoothstep(0.2, 0.5, p.z);
+  return max(jaw, max(mous, bridge));
+}
+`;
+
 function skinTo(geometry: THREE.BufferGeometry, boneIndex: number) {
   const n = geometry.attributes.position.count;
   const idx = new Uint16Array(n * 4);
@@ -136,7 +160,7 @@ export function addSpecsBeardAndSmile(root: THREE.Object3D) {
     const tris: number[] = [];
     for (let t = 0; t < index.count; t += 3) {
       const a = index.getX(t), b = index.getX(t + 1), c = index.getX(t + 2);
-      if (weights[a] < 0.02 && weights[b] < 0.02 && weights[c] < 0.02) continue;
+      if (weights[a] < 0.001 && weights[b] < 0.001 && weights[c] < 0.001) continue;
       for (const v of [a, b, c]) {
         if (!remap.has(v)) {
           remap.set(v, keep.length);
@@ -148,7 +172,7 @@ export function addSpecsBeardAndSmile(root: THREE.Object3D) {
     const n = keep.length;
     const bp = new Float32Array(n * 3);
     const bn = new Float32Array(n * 3);
-    const bc = new Float32Array(n * 4);
+    const rest = new Float32Array(n * 3);
     const bi = new Uint16Array(n * 4);
     const bw = new Float32Array(n * 4);
     const si = g.attributes.skinIndex;
@@ -162,10 +186,9 @@ export function addSpecsBeardAndSmile(root: THREE.Object3D) {
       bn[k * 3] = nor.getX(v);
       bn[k * 3 + 1] = nor.getY(v);
       bn[k * 3 + 2] = nor.getZ(v);
-      bc[k * 4] = hairColor.r;
-      bc[k * 4 + 1] = hairColor.g;
-      bc[k * 4 + 2] = hairColor.b;
-      bc[k * 4 + 3] = smooth(0.12, 0.7, w); // soft edges
+      rest[k * 3] = pos.getX(v);
+      rest[k * 3 + 1] = pos.getY(v);
+      rest[k * 3 + 2] = pos.getZ(v);
       for (let j = 0; j < 4; j++) {
         bi[k * 4 + j] = si.getComponent(v, j);
         bw[k * 4 + j] = sw.getComponent(v, j);
@@ -174,16 +197,28 @@ export function addSpecsBeardAndSmile(root: THREE.Object3D) {
     const bg = new THREE.BufferGeometry();
     bg.setAttribute("position", new THREE.BufferAttribute(bp, 3));
     bg.setAttribute("normal", new THREE.BufferAttribute(bn, 3));
-    bg.setAttribute("color", new THREE.BufferAttribute(bc, 4));
+    bg.setAttribute("aRest", new THREE.BufferAttribute(rest, 3));
     bg.setAttribute("skinIndex", new THREE.Uint16BufferAttribute(bi, 4));
     bg.setAttribute("skinWeight", new THREE.Float32BufferAttribute(bw, 4));
     bg.setIndex(tris);
     const beardMat = new THREE.MeshStandardMaterial({
-      vertexColors: true,
+      color: hairColor,
       transparent: true,
       roughness: 0.92,
       metalness: 0,
     });
+    beardMat.onBeforeCompile = (shader) => {
+      shader.vertexShader = shader.vertexShader
+        .replace("#include <common>", "#include <common>\nattribute vec3 aRest;\nvarying vec3 vRest;")
+        .replace("#include <begin_vertex>", "#include <begin_vertex>\nvRest = aRest;");
+      shader.fragmentShader = shader.fragmentShader
+        .replace("#include <common>", "#include <common>\nvarying vec3 vRest;\n" + BEARD_MASK_GLSL)
+        .replace(
+          "#include <color_fragment>",
+          "#include <color_fragment>\ndiffuseColor.a *= smoothstep(0.1, 0.62, beardWeight(vRest));\nif (diffuseColor.a < 0.02) discard;"
+        );
+    };
+    beardMat.customProgramCacheKey = () => "beard-mask";
     const beard = new THREE.SkinnedMesh(bg, beardMat);
     beard.name = "beard";
     beard.frustumCulled = false;
