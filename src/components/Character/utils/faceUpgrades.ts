@@ -289,10 +289,20 @@ export function addSpecsBeardAndSmile(root: THREE.Object3D) {
   );
   addPart(bridge, frameMat, "glassesBridge");
 
-  faceRig.setSmile = (value: number) => {
-    const s = Math.min(1, Math.max(0, value));
-    smileTargets.forEach(({ mesh, index }) => {
-      if (mesh.morphTargetInfluences) mesh.morphTargetInfluences[index] = s;
+  // The face's own "Blink" clip writes the whole morphTargetInfluences array every
+  // frame, which wiped the smile back to 0 on each blink (smile on / off / on...).
+  // So the smile slot is an accessor the animation mixer cannot overwrite.
+  let smileValue = 0;
+  smileTargets.forEach(({ mesh, index }) => {
+    Object.defineProperty(mesh.morphTargetInfluences!, index, {
+      get: () => smileValue,
+      set: () => {},
+      enumerable: true,
+      configurable: true,
     });
+  });
+
+  faceRig.setSmile = (value: number) => {
+    smileValue = Math.min(1, Math.max(0, value));
   };
 }
